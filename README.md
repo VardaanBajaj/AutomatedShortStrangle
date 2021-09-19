@@ -1,5 +1,5 @@
 # AutomatedShortStrangle
-This repository automates the implementation of weekly banknifty option trading strategy.
+This repository automates the implementation of weekly banknifty option trading strategy mentioned here: https://www.youtube.com/watch?v=_t-vfmCG3Mo
 
 # Constraints
 Following are the constraints:
