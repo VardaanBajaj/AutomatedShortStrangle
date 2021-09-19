@@ -3,6 +3,7 @@ This repository automates the implementation of weekly banknifty option trading 
 
 # Constraints
 Following are the constraints:
+
 0. Find premiums with values close to 115 on both Ce and Pe and create strangle
 1. Exit the trade as soon as profit >= 4000 before expiry morning, else exit on expiry morning
 2. If difference between premiums is more than 50% during the day, square off position with lower premium and
