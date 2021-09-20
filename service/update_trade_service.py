@@ -127,7 +127,7 @@ class UpdateTradeService:
         print(f"Open put positions: {trade_details.open_put_positions}")
         print(f"Strangle num lots: {trade_details.strangle_num_lots}")
         print(f"Modifications in trade so far: {trade_details.modifications_in_trade_so_far}")
-        print(f"Current profit: {trade_details.profit * BANK_NIFTY_LOT_SIZE}")
+        print(f"Current profit: {trade_details.profit}")
         print(f"Profit exit: {trade_details.profit_exit}")
         print(f"Failure exit: {trade_details.failure_exit}")
         print(end="\n\n")
@@ -301,7 +301,8 @@ class UpdateTradeService:
 
     def close_all_positions(self, trade_details: TradeDetails):
         if trade_details.profit_exit is True or trade_details.failure_exit is True:
-            print(f"Total profit: {trade_details.profit * BANK_NIFTY_LOT_SIZE}")
+            trade_details.profit = trade_details.profit * BANK_NIFTY_LOT_SIZE
+            print(f"Total profit: {trade_details.profit}")
             print(f"Trade details: {self.print_trade_details(trade_details)}")
             self.start_trade_service.execute_dummy_buy_trade(strike_price=trade_details.call_strike,
                                                              premium=trade_details.call_premium,
