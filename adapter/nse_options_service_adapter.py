@@ -56,6 +56,7 @@ class NSEOptionsServiceAdapter:
                         break
                     else:
                         print("No expiry this week.")
+                        print()
                         exit(0)
             proposed_next_expiry = self.dates_parser.date_parser_init.change_date_format_1(proposed_next_expiry)
 
@@ -74,6 +75,7 @@ class NSEOptionsServiceAdapter:
         next_expiry_date = self.dates_parser.proposed_next_weekly_expiry_date(datetime.today().date())
         actual_next_weekly_expiry = self.actual_next_weekly_expiry_date(option_chain, next_expiry_date)
         print(actual_next_weekly_expiry)
+        print()
 
         put_option_data = dict()
         call_option_data = dict()
@@ -89,7 +91,8 @@ class NSEOptionsServiceAdapter:
 
         end_time = datetime.now()
         total_time = end_time - start_time
-        print(total_time)
+        print(f"Total time: {total_time}")
+        print()
 
         return put_option_data, call_option_data, actual_next_weekly_expiry
 

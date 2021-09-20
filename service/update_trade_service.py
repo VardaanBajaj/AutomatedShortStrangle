@@ -79,8 +79,10 @@ class UpdateTradeService:
                 trade_details = self.start_new_trade(security)
             else:
                 print(f"Current open position details: {self.print_trade_details(trade_details)}")
+                print()
         else:
             print("Market closed today")
+            print()
         # print(f"Trade details: {self.print_trade_details(trade_details)}")
 
         if input("Are these details correct? (y/n)") == "n".lower():
@@ -125,9 +127,10 @@ class UpdateTradeService:
         print(f"Open put positions: {trade_details.open_put_positions}")
         print(f"Strangle num lots: {trade_details.strangle_num_lots}")
         print(f"Modifications in trade so far: {trade_details.modifications_in_trade_so_far}")
-        print(f"Current profit: {trade_details.profit}")
+        print(f"Current profit: {trade_details.profit * BANK_NIFTY_LOT_SIZE}")
         print(f"Profit exit: {trade_details.profit_exit}")
         print(f"Failure exit: {trade_details.failure_exit}")
+        print(end="\n\n")
 
     def modify_trade_details(self, option_strike, option_premium, trade_details: TradeDetails, option_data: dict, type):
         if option_strike is None or option_premium is None:
@@ -163,9 +166,9 @@ class UpdateTradeService:
                                                                  call_or_put="CE",
                                                                  no_of_lots=trade_details.open_call_positions,
                                                                  security=trade_details.security)
-                trade_details.profit += trade_details.call_premium - option_premium  # only call position booked profit updated
+                trade_details.profit += (trade_details.call_premium - option_premium)  # only call position booked profit updated
                 trade_details.profit *= (1 - BROKER_CHARGES)
-                trade_details.profit *= BANK_NIFTY_LOT_SIZE
+                # trade_details.profit *= BANK_NIFTY_LOT_SIZE
                 trade_details.call_strike = option_strike
                 trade_details.call_premium = option_premium
                 self.start_trade_service.execute_dummy_sell_trade(strike_price=option_strike, premium=option_premium,
@@ -179,9 +182,9 @@ class UpdateTradeService:
                                                                  call_or_put="PE",
                                                                  no_of_lots=trade_details.open_put_positions,
                                                                  security=trade_details.security)
-                trade_details.profit += trade_details.put_premium - option_premium  # only put position booked profit updated
+                trade_details.profit += (trade_details.put_premium - option_premium)  # only put position booked profit updated
                 trade_details.profit *= (1 - BROKER_CHARGES)
-                trade_details.profit *= BANK_NIFTY_LOT_SIZE
+                # trade_details.profit *= BANK_NIFTY_LOT_SIZE
                 trade_details.put_strike = option_strike
                 trade_details.put_premium = option_premium
                 self.start_trade_service.execute_dummy_sell_trade(strike_price=option_strike, premium=option_premium,
@@ -203,25 +206,33 @@ class UpdateTradeService:
         put_premium = trade_details.put_premium
 
         if put_premium < call_premium and constraint_3(put_premium, call_premium):
+            print("Constraint 3 satisfied. Updating premium prices.")
+            print(f"Current call premium: {call_premium}. Current put premium {put_premium}")
             new_put_strike_price, new_put_premium = self.option_details_in_optimal_range(call_premium, put_option_data)
+            print(f"Modified put strike price: {new_put_strike_price}. Modified put premium: {new_put_premium}")
+            print()
             trade_details = self.modify_trade_details(new_put_strike_price, new_put_premium, trade_details,
                                                       put_option_data, type="PE")
-            trade_details.profit += trade_details.call_premium - call_option_data[trade_details.call_strike].last_price
-            trade_details.profit *= BANK_NIFTY_LOT_SIZE
+            trade_details.profit += (trade_details.call_premium - call_option_data[trade_details.call_strike].last_price)
+            # trade_details.profit *= BANK_NIFTY_LOT_SIZE
 
         elif put_premium > call_premium and constraint_3(call_premium, put_premium):
+            print("Constraint 3 satisfied. Updating premium prices.")
+            print(f"Current call premium: {call_premium}. Current put premium {put_premium}")
             new_call_strike_price, new_call_premium = self.option_details_in_optimal_range(put_premium,
                                                                                            call_option_data)
+            print(f"Modified call strike price: {new_call_strike_price}. Modified call premium: {new_call_premium}")
+            print()
             trade_details = self.modify_trade_details(new_call_strike_price, new_call_premium, trade_details,
                                                       call_option_data, type="CE")
-            trade_details.profit += trade_details.put_premium - call_option_data[trade_details.put_strike].last_price
-            trade_details.profit *= BANK_NIFTY_LOT_SIZE
+            trade_details.profit += (trade_details.put_premium - call_option_data[trade_details.put_strike].last_price)
+            # trade_details.profit *= BANK_NIFTY_LOT_SIZE
 
         else:  # update the profit if everything is normal
             trade_details.profit += (
                     trade_details.put_premium - put_option_data[trade_details.put_strike].last_price
                     + trade_details.call_premium - call_option_data[trade_details.call_strike].last_price)
-            trade_details.profit *= BANK_NIFTY_LOT_SIZE
+            # trade_details.profit *= BANK_NIFTY_LOT_SIZE
 
         # constraint 4
         if trade_details.profit >= (MAX_PROFIT + (BROKER_CHARGES * MAX_PROFIT)):
@@ -245,25 +256,33 @@ class UpdateTradeService:
         put_premium = trade_details.put_premium
 
         if put_premium < call_premium and constraint_2(put_premium, call_premium):
+            print("Constraint 2 satisfied. Updating premium prices.")
+            print(f"Current call premium: {call_premium}. Current put premium {put_premium}")
             new_put_strike_price, new_put_premium = self.option_details_in_optimal_range(call_premium, put_option_data)
+            print(f"Modified put strike price: {new_put_strike_price}. Modified put premium: {new_put_premium}")
+            print()
             trade_details = self.modify_trade_details(new_put_strike_price, new_put_premium, put_option_data,
                                                       trade_details, type="PE")
-            trade_details.profit += trade_details.call_premium - call_option_data[trade_details.call_strike].last_price
-            trade_details.profit *= BANK_NIFTY_LOT_SIZE
+            trade_details.profit += (trade_details.call_premium - call_option_data[trade_details.call_strike].last_price)
+            # trade_details.profit *= BANK_NIFTY_LOT_SIZE
 
         elif put_premium > call_premium and constraint_2(call_premium, put_premium):
+            print("Constraint 2 satisfied. Updating premium prices.")
+            print(f"Current call premium: {call_premium}. Current put premium {put_premium}")
             new_call_strike_price, new_call_premium = self.option_details_in_optimal_range(put_premium,
                                                                                            call_option_data)
+            print(f"Modified call strike price: {new_call_strike_price}. Modified call premium: {new_call_premium}")
+            print()
             trade_details = self.modify_trade_details(new_call_strike_price, new_call_premium, call_option_data,
                                                       trade_details, type="CE")
-            trade_details.profit += trade_details.put_premium - call_option_data[trade_details.put_strike].last_price
-            trade_details.profit *= BANK_NIFTY_LOT_SIZE
+            trade_details.profit += (trade_details.put_premium - call_option_data[trade_details.put_strike].last_price)
+            # trade_details.profit *= BANK_NIFTY_LOT_SIZE
 
         else:  # update the profit if everything is normal
             trade_details.profit += (
                     trade_details.put_premium - put_option_data[trade_details.put_strike].last_price
                     + trade_details.call_premium - call_option_data[trade_details.call_strike].last_price)
-            trade_details.profit *= BANK_NIFTY_LOT_SIZE
+            # trade_details.profit *= BANK_NIFTY_LOT_SIZE
 
         # constraint 4
         if trade_details.profit >= (MAX_PROFIT + (BROKER_CHARGES * MAX_PROFIT)):
@@ -282,7 +301,7 @@ class UpdateTradeService:
 
     def close_all_positions(self, trade_details: TradeDetails):
         if trade_details.profit_exit is True or trade_details.failure_exit is True:
-            print(f"Total profit: {trade_details.profit}")
+            print(f"Total profit: {trade_details.profit * BANK_NIFTY_LOT_SIZE}")
             print(f"Trade details: {self.print_trade_details(trade_details)}")
             self.start_trade_service.execute_dummy_buy_trade(strike_price=trade_details.call_strike,
                                                              premium=trade_details.call_premium,

@@ -52,14 +52,18 @@ class StartTradeService:
     def execute_dummy_buy_trade(self, strike_price, premium, call_or_put, no_of_lots=1, security="BANKNIFTY"):
         if strike_price is None or premium is None:
             print(f"Error squaring off {call_or_put} position")
+            print()
         print(
             f"{no_of_lots} lot(s) of {security} bought successfully. {call_or_put}: Strike price {strike_price} @ Premium: {premium}")
+        print()
 
     def execute_dummy_sell_trade(self, strike_price, premium, call_or_put, no_of_lots=1, security="BANKNIFTY"):
         if strike_price is None or premium is None:
             print(f"Error squaring off {call_or_put} position")
+            print()
         print(
             f"{no_of_lots} lot(s) of {security} sold successfully. {call_or_put}: Strike price {strike_price} @ Premium: {premium}")
+        print()
 
     def is_strike_price_sane(self, strike_price):
         return strike_price.open_interest > 0 and strike_price.change_in_open_interest != 0 and \
@@ -101,7 +105,7 @@ class StartTradeService:
             if res2 == 'y'.lower() or res == 'yes'.lower():
                 time_obj = datetime.now()
                 if TRADE_START_DAY <= time_obj.weekday() <= TRADE_END_DAY:
-                    print(time_obj.hour, time_obj.minute)
+                    print(f"Time: {time_obj.hour}, {time_obj.minute}")
                     if self.time_in_range(time(START_TIME_HOURS, START_TIME_MINS, START_TIME_SECS),
                                           time(END_TIME_HOURS, END_TIME_MINS, END_TIME_SECS),
                                           time_obj.time()):
@@ -110,12 +114,16 @@ class StartTradeService:
                                                                  security)
                     else:
                         print("Can't execute trade right now. Please try between 9:20am and 3:15pm on weekdays")
+                        print()
                 else:
                     print("Market closed on weekends")
+                    print()
             else:
                 print("No strangle created")
+                print()
         else:
             print("No strangle created")
+            print()
         # subject to change (this is used to see open positions. once broker is included, will fetch from there)
         return self.trade_details
 
