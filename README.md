@@ -12,4 +12,4 @@ Following are the constraints:
     and start a new position with premimum which is 80%-95% of thr higher premium
 4. If strike price of CE <= strike price of PE, exit the trade
 
-This is a WIP, feel free to try it out and raise a PR in case any bugs are found.
+Feel free to try it out and raise a PR in case any bugs are found.
